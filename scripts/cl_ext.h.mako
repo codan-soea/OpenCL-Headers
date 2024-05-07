@@ -312,6 +312,21 @@ extern "C" {
 #define ${name.upper()}_EXTENSION_NAME ${"\\"}
     "${name}"
 
+%if extension.get('revision'):
+<%
+  import re
+  sem_ver = re.match('[0-9]+\.[0-9]+\.?[0-9]+', extension.get('revision'))
+  if not sem_ver:
+    raise TypeError(name +
+        ' XML revision field is not semantically versioned as "major.minor.patch"')
+  version = sem_ver[0].split('.')
+  major = version[0]
+  minor = version[1]
+  patch = version[2]
+%>
+#define ${name.upper()}_EXTENSION_VERSION CL_MAKE_VERSION(${major}, ${minor}, ${patch})
+%endif
+
 %for block in extension.findall('require'):
 %  if shouldEmit(block):
 %    if block.get('condition'):
